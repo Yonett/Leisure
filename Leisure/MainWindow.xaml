@@ -7,11 +7,11 @@
         xmlns:viewmodels="clr-namespace:Leisure.ViewModels"
         xmlns:converters="clr-namespace:Leisure.Converters"
         mc:Ignorable="d"
-        Title="MainWindow"
         Width="1265"
         Height="900"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Title="LEISURE">
     <Window.Resources>
 
         <!-- Background Colors -->
