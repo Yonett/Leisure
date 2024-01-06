@@ -1,0 +1,295 @@
+﻿<Window x:Class="Leisure.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Leisure"
+        xmlns:viewmodels="clr-namespace:Leisure.ViewModels"
+        xmlns:converters="clr-namespace:Leisure.Converters"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        Width="1265"
+        Height="900"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+
+        <!-- Background Colors -->
+        <SolidColorBrush x:Key="backgroundColorDark"
+                         Color="#596174"/>
+        <SolidColorBrush x:Key="backgroundColorLight"
+                         Color="#A4B0BE"/>
+        <!-- xxx -->
+
+        <!-- Players Colors -->
+        <SolidColorBrush x:Key="firstPlayerColor"
+                         Color="#F53B57"/>
+        <SolidColorBrush x:Key="secondPlayerColor"
+                         Color="#10AC84"/>
+        <!-- xxx -->
+
+        <!-- Text Colors -->
+        <SolidColorBrush x:Key="primaryText"
+                         Color="#F1F2F6"/>
+        <SolidColorBrush x:Key="secondaryText"
+                         Color="#0FBCF9"/>
+        <SolidColorBrush x:Key="additionalText"
+                         Color="#485460"/>
+        <!-- xxx -->
+
+        <SolidColorBrush x:Key="additional"
+                         Color="#2d3436"/>
+
+        <SolidColorBrush x:Key="freeCellWhite"
+                         Color="#F1F2F6"/>
+        
+        <!-- Converters -->
+        <converters:FirstPlayerRoundToVisibility x:Key="FirstPlayerRoundToVisibility"/>
+        <converters:SecondPlayerRoundToVisibility x:Key="SecondPlayerRoundToVisibility"/>
+        <converters:GameStateToCursor x:Key="GameStateToCursor"/>
+        <converters:DiceImageConverter x:Key="DiceImageConverter"/>
+        <!-- xxx -->
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="HorizontalAlignment"
+                    Value="Center"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource additional}"/>
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center"/>
+            <Setter Property="Background"
+                    Value="{StaticResource additional}"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource primaryText}"/>
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+        </Style>
+
+    </Window.Resources>
+    
+    <Window.DataContext>
+        <viewmodels:MainWindowViewModel/>
+    </Window.DataContext>
+    
+    <Grid Background="{StaticResource backgroundColorDark}"
+          ShowGridLines="False">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="12*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Grid First Row First Player Panel -->
+            <TextBlock DataContext="{Binding FirstPlayer}"
+                       Text="{Binding Name}"
+                       Margin="20 0 0 0"
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Left"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource primaryText}"
+                       x:Name="firstPlayerName"
+                       FontSize="30"
+                       Grid.Row="0"
+                       Grid.Column="0"/>
+
+            <TextBlock VerticalAlignment="Bottom"
+                       HorizontalAlignment="Center"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource secondaryText}"
+                       FontSize="30"
+                       Grid.Row="0"
+                       Grid.Column="1"
+                       x:Name="firstTurn"
+                       Text="YOUR TURN"
+                       Visibility="{Binding TurnNumber, Converter={StaticResource FirstPlayerRoundToVisibility}}"/>
+
+            <TextBlock DataContext="{Binding FirstPlayer}"
+                       Text="{Binding Score}"
+                       Margin="0 0 20 0"
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Right"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource firstPlayerColor}"
+                       FontSize="30"
+                       Grid.Row="0"
+                       Grid.Column="2"
+                       x:Name="firstScore"/>
+            <!-- xxx -->
+
+            <!-- Grid Second Row Game Field Canvas -->
+            <Border Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    x:Name="GameFieldContainer">
+                
+                <Canvas x:Name="GameField"
+                        Margin="20 0 20 0"
+                        Background="{StaticResource backgroundColorLight}"
+                        Cursor="{Binding GameState, Converter={StaticResource GameStateToCursor}}"
+                        MouseEnter="GameField_MouseEnter"
+                        MouseMove="GameField_MouseMove"
+                        MouseLeave="GameField_MouseLeave"/>
+                
+            </Border>
+            <!-- xxx -->
+
+            <!-- Grid Third Row Second Player Panel -->
+            <TextBlock DataContext="{Binding SecondPlayer}"
+                       Text="{Binding Score}"
+                       Margin="20 0 0 0"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Left"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource secondPlayerColor}"
+                       FontSize="30"
+                       Grid.Row="2"
+                       Grid.Column="0"
+                       x:Name="secondScore"/>
+
+            <TextBlock VerticalAlignment="Top"
+                       HorizontalAlignment="Center"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource secondaryText}"
+                       FontSize="30"
+                       Grid.Row="2"
+                       Grid.Column="1"
+                       x:Name="secondTurn"
+                       Text="YOUR TURN"
+                       Visibility="{Binding TurnNumber, Converter={StaticResource SecondPlayerRoundToVisibility}}"/>
+
+            <TextBlock DataContext="{Binding SecondPlayer}"
+                       Text="{Binding Name}"
+                       Margin="0 0 20 0"
+                       x:Name="secondPlayerName"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Right"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource primaryText}"
+                       FontSize="30"
+                       Grid.Row="2"
+                       Grid.Column="2"/>
+            <!-- xxx -->
+        </Grid>
+
+        <Grid Grid.Column="1">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="6*"/>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Margin="0 0 0 0"
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Center"
+                       Foreground="{StaticResource primaryText}"
+                       FontWeight="Bold"
+                       FontSize="30"
+                       Grid.Row="0"
+                       x:Name="TurnName"
+                       Text="{Binding StringFormat=TURN {0}, Path=TurnNumber}"/>
+
+            <ScrollViewer x:Name="DataScroll"
+                          Margin="0 0 20 0" Grid.Row="1">
+
+                <DataGrid ItemsSource="{Binding Turns}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          Margin="20 0 0 0"
+                          IsHitTestVisible="False"
+                          Background="{StaticResource backgroundColorLight}"
+                          HorizontalGridLinesBrush="Transparent"
+                          VerticalGridLinesBrush="Transparent"
+                          RowBackground="Transparent">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="TURN"
+                                            Binding="{Binding Number}"
+                                            Width="*"/>
+                        <DataGridTextColumn Header="PLAYER"
+                                            Binding="{Binding PlayerSerial}"
+                                            Width="*"/>
+                        <DataGridTextColumn Header="WIDTH"
+                                            Binding="{Binding PieceWidth}"
+                                            Width="*"/>
+                        <DataGridTextColumn Header="HEIGHT"
+                                            Binding="{Binding PieceHeight}"
+                                            Width="*"/>
+                        <DataGridTextColumn Header="SCORE"
+                                            Binding="{Binding Score}"
+                                            Width="*"/>
+                        <DataGridCheckBoxColumn Header="POSSIBLE"
+                                                Binding="{Binding Available}"
+                                                Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+            </ScrollViewer>
+
+            <Grid Margin="20 20 20 0"
+                  Grid.Row="2"
+                  Background="{StaticResource backgroundColorLight}">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Image Grid.Column="0"
+                       Margin="20 20 20 20"
+                       DataContext="{Binding Piece}"
+                       IsHitTestVisible="False"
+                       Source="{Binding Width, Converter={StaticResource DiceImageConverter}}"/>
+
+                <Image Grid.Column="1"
+                       Margin="20 20 20 20"
+                       DataContext="{Binding Piece}"
+                       IsHitTestVisible="False"
+                       Source="{Binding Height, Converter={StaticResource DiceImageConverter}}"/>
+
+            </Grid>
+
+            <Button Command="{Binding command}"
+                    Margin="20 20 20 0"
+                    FontWeight="Bold"
+                    FontSize="40"
+                    Foreground="#eef4f4"
+                    Background="#a4b0be"
+                    Grid.Row="3"
+                    x:Name="RollTheDice"
+                    Content="ROLL THE DICE"/>
+
+            <TextBlock HorizontalAlignment="Right"
+                       VerticalAlignment="Bottom"
+                       FontWeight="Bold"
+                       FontSize="20"
+                       Foreground="{StaticResource additionalText}"
+                       Grid.Row="4"
+                       Text="LEISURE STABLE RELEASE"/>
+
+        </Grid>
+    </Grid>
+</Window>
