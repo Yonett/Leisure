@@ -290,11 +290,12 @@ namespace Leisure
                     Console.WriteLine("Curr game state {0}", viewModel.GameState);
                     if (viewModel.GameState == (int)GameStates.PostGame)
                     {
-                        viewModel.FirstPlayer.Score = 0;
-                        viewModel.SecondPlayer.Score = 0;
+                        viewModel.FirstPlayer.Score = 1;
+                        viewModel.SecondPlayer.Score = 1;
                         viewModel.Piece.Width = 0;
                         viewModel.Piece.Height = 0;
                         viewModel.TurnNumber = 1;
+                        viewModel.UnavailableTurns = 0;
 
                         viewModel.Turns.Clear();
 
