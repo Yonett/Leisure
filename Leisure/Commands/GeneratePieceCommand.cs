@@ -63,6 +63,8 @@ namespace Leisure.Commands
                 {
                     Console.WriteLine("Too much unavailabel turns");
                     string winner = String.Format("{0} PLAYER WINS", viewModel.FirstPlayer.Score > viewModel.SecondPlayer.Score ? "FIRST" : "SECOND");
+                    if (viewModel.FirstPlayer.Score == viewModel.SecondPlayer.Score)
+                        winner = "DRAW";
                     //MessageBox.Show(winner);
                     LeisureMessageBox winner_box = new LeisureMessageBox(winner, "RESTART GAME");
                     this.viewModel.GameState = (int)GameStates.PostGame;
