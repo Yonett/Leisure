@@ -47,7 +47,6 @@ namespace Leisure.Commands
             {
                 Console.WriteLine("Player {0} W - {1} H - {2} turn is unavailable", viewModel.Piece.Kind, width, height);
                 LeisureMessageBox box = new LeisureMessageBox("TURN IS IMPOSSIBLE", "CHANGE PLAYER");
-                //MessageBox.Show("Turn is unavailable!");
 
                 viewModel.Turns.Add(new Turn(
                                 viewModel.TurnNumber,
@@ -62,10 +61,14 @@ namespace Leisure.Commands
                 if (viewModel.UnavailableTurns > 1)
                 {
                     Console.WriteLine("Too much unavailabel turns");
-                    string winner = String.Format("{0} PLAYER WINS", viewModel.FirstPlayer.Score > viewModel.SecondPlayer.Score ? "FIRST" : "SECOND");
+                    string playerWinner;
+                    if (viewModel.FirstPlayer.Score > viewModel.SecondPlayer.Score)
+                        playerWinner = "FIRST";
+                    else
+                        playerWinner = "SECOND";
+                    string winner = String.Format("{0} PLAYER WINS", playerWinner);
                     if (viewModel.FirstPlayer.Score == viewModel.SecondPlayer.Score)
                         winner = "DRAW";
-                    //MessageBox.Show(winner);
                     LeisureMessageBox winner_box = new LeisureMessageBox(winner, "RESTART GAME");
                     this.viewModel.GameState = (int)GameStates.PostGame;
                     return;

@@ -116,7 +116,7 @@ namespace Leisure.ViewModels
 
         public MainWindowViewModel()
         {
-            size = 25;
+            size = 7;
 
             piece = new Piece() { Width = 0, Height = 0, Kind = 0};
 

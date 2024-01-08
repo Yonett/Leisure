@@ -41,61 +41,8 @@ namespace Leisure
                 viewModel.PropertyChanged += RestartGame;
                 GameField.Loaded += GameField_Loaded;
 
-                if (viewModel.FieldRects != null)
-                {
-                    int size = viewModel.Size;
-                    int index;
-
-                    for (int i = 0; i < size; i++)
-                    {
-                        for (int j = 0; j < size; j++)
-                        {
-                            index = i * size + j;
-
-                            viewModel.FieldRects[index] = new Rectangle();
-
-                            switch (viewModel.Field.cells[index])
-                            {
-                                case 1:
-                                    viewModel.FieldRects[index].Fill = firstPlayerColor;
-                                    break;
-                                case 2:
-                                    viewModel.FieldRects[index].Fill = secondPlayerColor;
-                                    break;
-                                case 0:
-                                    viewModel.FieldRects[index].Fill = freeCellWhiteColor;
-                                    viewModel.FieldRects[index].MouseLeftButtonDown += MainWindow_MouseLeftButtonDown;
-                                    break;
-                                case -1:
-                                    viewModel.FieldRects[index].Fill = additionalColor;
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            GameField.Children.Add(viewModel.FieldRects[index]);
-                        }
-                    }
-                }
-
-                if (viewModel.PieceRects != null)
-                {
-                    int size = 6;
-                    int index;
-                    for (int i = 0; i < size; i++)
-                    {
-                        for (int j = 0; j < size; j++)
-                        {
-                            index = i * size + j;
-
-                            viewModel.PieceRects[index] = new Rectangle();
-                            viewModel.PieceRects[index].Stroke = firstPlayerColor;
-                            viewModel.PieceRects[index].Visibility = Visibility.Hidden;
-
-                            GameField.Children.Add(viewModel.PieceRects[index]);
-                        }
-                    }
-                }
+                BrushField(true);
+                BrushPieceRects(2); // start a game
                 viewModel.GameState = (int)GameStates.PreTurn;
             }
         }
@@ -166,7 +113,10 @@ namespace Leisure
                         for (int i = 0; i < viewModel.Piece.Height; i++)
                             for (int j = 0; j < viewModel.Piece.Width; j++)
                             { 
-                                viewModel.FieldRects[index + i * viewModel.Size + j].Fill = viewModel.Piece.Kind == 1 ? firstPlayerColor : secondPlayerColor;
+                                if(viewModel.Piece.Kind == 1)
+                                    viewModel.FieldRects[index + i * viewModel.Size + j].Fill = firstPlayerColor;
+                                else
+                                    viewModel.FieldRects[index + i * viewModel.Size + j].Fill = secondPlayerColor;
                                 viewModel.Field.cells[index + i * viewModel.Size + j] = viewModel.Piece.Kind;
                                 viewModel.PieceRects[i * viewModel.Piece.Width + j].Visibility = Visibility.Hidden;
                             }
@@ -214,9 +164,8 @@ namespace Leisure
                 if (viewModel.PieceRects == null)
                     return;
 
-                for (int i = 0; i < viewModel.Piece.Height; i++)
-                    for (int j = 0; j < viewModel.Piece.Width; j++)
-                        viewModel.PieceRects[i * viewModel.Piece.Width + j].Visibility = Visibility.Visible;
+                BrushPieceRects(1); // move cursor to field
+
             }
         }
 
@@ -253,10 +202,7 @@ namespace Leisure
 
                 if (viewModel.GameState != (int)GameStates.Turn)
                     return;
-
-                for (int i = 0; i < 6; i++)
-                    for (int j = 0; j < 6; j++)
-                        viewModel.PieceRects[i * viewModel.Piece.Width + j].Visibility = Visibility.Hidden;
+                BrushPieceRects(0); // move cursor from field
             }
         }
 
@@ -269,13 +215,7 @@ namespace Leisure
 
                 if (e.PropertyName == nameof(viewModel.Piece.Kind))
                 {
-                    int size = 6;
-                    Brush brush = viewModel.Piece.Kind == 1 ? firstPlayerColor : secondPlayerColor;
-
-                    for(int i = 0; i < size; i++)
-                        for (int j = 0; j < size; j++)
-                            viewModel.PieceRects[i * size + j].Stroke = brush;
-
+                    BrushPieceRects(4); // change the color
                     DataScroll.ScrollToBottom();
                 }
             }
@@ -287,7 +227,6 @@ namespace Leisure
             {
                 if (e.PropertyName == nameof(viewModel.GameState))
                 {
-                    Console.WriteLine("Curr game state {0}", viewModel.GameState);
                     if (viewModel.GameState == (int)GameStates.PostGame)
                     {
                         viewModel.FirstPlayer.Score = 1;
@@ -302,39 +241,59 @@ namespace Leisure
                         viewModel.Field.ResetCells();
                         viewModel.Field.InitCells();
 
-                        if (viewModel.FieldRects != null)
-                        {
-                            int size = viewModel.Size;
-                            int index;
+                        BrushField(false);
+                        BrushPieceRects(3); // restart
+                        viewModel.GameState = (int)GameStates.PreTurn;
+                    }
+                }
+            }
+        }
 
+
+
+        private void BrushPieceRects(int state)
+        {
+            if (DataContext is MainWindowViewModel viewModel)
+            { 
+                if (viewModel.PieceRects == null)
+                        return;
+                switch (state)
+                {
+                    case 0: // 0 - move cursor from field
+                        {
+                            int size = 6;
+                            for (int i = 0; i < size; i++)
+                                for (int j = 0; j < size; j++)
+                                    viewModel.PieceRects[i * viewModel.Piece.Width + j].Visibility = Visibility.Hidden;
+                            break;
+                        }
+                    case 1: // 1 - move cursor to field
+                        {
+                            for (int i = 0; i < viewModel.Piece.Height; i++)
+                                for (int j = 0; j < viewModel.Piece.Width; j++)
+                                    viewModel.PieceRects[i * viewModel.Piece.Width + j].Visibility = Visibility.Visible;
+                            break;
+                        }
+                    case 2: // 2 - start a game
+                        {
+                            int size = 6;
+                            int index;
                             for (int i = 0; i < size; i++)
                             {
                                 for (int j = 0; j < size; j++)
                                 {
                                     index = i * size + j;
 
-                                    switch (viewModel.Field.cells[index])
-                                    {
-                                        case 1:
-                                            viewModel.FieldRects[index].Fill = firstPlayerColor;
-                                            break;
-                                        case 2:
-                                            viewModel.FieldRects[index].Fill = secondPlayerColor;
-                                            break;
-                                        case 0:
-                                            viewModel.FieldRects[index].Fill = freeCellWhiteColor;
-                                            break;
-                                        case -1:
-                                            viewModel.FieldRects[index].Fill = additionalColor;
-                                            break;
-                                        default:
-                                            break;
-                                    }
+                                    viewModel.PieceRects[index] = new Rectangle();
+                                    viewModel.PieceRects[index].Stroke = firstPlayerColor;
+                                    viewModel.PieceRects[index].Visibility = Visibility.Hidden;
+
+                                    GameField.Children.Add(viewModel.PieceRects[index]);
                                 }
                             }
+                            break;
                         }
-
-                        if (viewModel.PieceRects != null)
+                    case 3: // 3 - restart
                         {
                             int size = 6;
                             int index;
@@ -348,11 +307,72 @@ namespace Leisure
                                     viewModel.PieceRects[index].Visibility = Visibility.Hidden;
                                 }
                             }
+                            break;
                         }
-                        viewModel.GameState = (int)GameStates.PreTurn;
-                    }
+                    case 4: // 4 - change a color
+                        {
+                            int size = 6;
+                            Brush brush;
+                            if (viewModel.Piece.Kind == 1)
+                                brush = firstPlayerColor;
+                            else
+                                brush = secondPlayerColor;
+                            for (int i = 0; i < size; i++)
+                                for (int j = 0; j < size; j++)
+                                    viewModel.PieceRects[i * size + j].Stroke = brush;
+                            break;
+                        }
+
+                    default:
+                        break;
                 }
             }
         }
+        
+        private void BrushField(bool Initialize) {
+            if (DataContext is MainWindowViewModel viewModel)
+            {
+                if (viewModel.FieldRects != null)
+                {
+                    int size = viewModel.Size;
+                    int index;
+
+                    for (int i = 0; i < size; i++)
+                    {
+                        for (int j = 0; j < size; j++)
+                        {
+                            index = i * size + j;
+
+                            if (Initialize == true) // не будет при Restart
+                                viewModel.FieldRects[index] = new Rectangle();
+
+                            switch (viewModel.Field.cells[index])
+                            {
+                                case 1:
+                                    viewModel.FieldRects[index].Fill = firstPlayerColor;
+                                    break;
+                                case 2:
+                                    viewModel.FieldRects[index].Fill = secondPlayerColor;
+                                    break;
+                                case 0:
+                                    viewModel.FieldRects[index].Fill = freeCellWhiteColor;
+                                    if (Initialize == true) // не будет при Restart
+                                        viewModel.FieldRects[index].MouseLeftButtonDown += MainWindow_MouseLeftButtonDown;
+                                    break;
+                                case -1:
+                                    viewModel.FieldRects[index].Fill = additionalColor;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (Initialize == true) // не будет при Restart
+                                GameField.Children.Add(viewModel.FieldRects[index]);
+                        }
+                    }
+                }
+            }
+
+        }
+
     }
 }
